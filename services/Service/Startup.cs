@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 using Article.Domain;
 using Article.Services;
@@ -16,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Service.Models;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Service
 {
@@ -43,7 +46,9 @@ namespace Service
 				.UseSqlServer(Configuration.GetConnectionString("sqlserver")));
 			services.AddScoped<IArtikelRepository, ArtikelRepository>();
 
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			services.AddMvc(options => options.RespectBrowserAcceptHeader = true)
+				.AddXmlSerializerFormatters()
+				.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
@@ -54,6 +59,30 @@ namespace Service
 				});
 
 			services.AddResponseCompression();
+			services.AddSwaggerGen(c =>
+				{
+					c.SwaggerDoc("v1", new Info()
+					{
+						Contact = new Contact() {  Name = "Ich", Email = "ich@email.de"},
+						Title = "Artikel API",
+						Version = "v1",
+					});
+					c.IncludeXmlComments(Path.Combine(System.AppContext.BaseDirectory, "Service.xml"));
+					c.AddSecurityDefinition("oauth2", new OAuth2Scheme()
+					{
+						Type = "oauth2",
+						Flow = "password",
+						TokenUrl = $"{Configuration.GetSection("IdentityServer").GetValue<string>("Url")}/connect/token",
+						Scopes = new Dictionary<string, string>()
+						{
+							{ "service", "Access to the Article API" },
+						},
+					});
+					c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>()
+					{
+						{ "oauth", new [] { "service" } }
+					});
+				});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -86,6 +115,15 @@ namespace Service
 
 			app.UseAuthentication();
 			app.UseMvc();
+			app.UseSwagger();
+			app.UseSwaggerUI(c =>
+			{
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "ArtikelAPI v1");
+				c.OAuthClientId("guiclient");
+				c.OAuthClientSecret("guisecret");
+				c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+			});
+
 		}
 	}
 }

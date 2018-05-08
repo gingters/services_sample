@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Service</name>
+    </assembly>
+    <members>
+        <member name="M:Service.Controllers.ArtikelController.GetById(System.Int32)">
+            <summary>
+            Gets a specified article by its ArtikelNummer
+            </summary>
+            <param name="artikelNummer">The id of the article to fetch</param>
+            <returns>An article, or Not Found</returns>
+        </member>
+        <member name="T:Service.Models.ArtikelKategorieViewModel">
+            <summary>
+            A catagory that specifies an article
+            </summary>
+        </member>
+        <member name="P:Service.Models.ArtikelKategorieViewModel.ArtikelNummer">
+            <summary>
+            Determines to which article this category belongs
+            </summary>
+        </member>
+        <member name="P:Service.Models.ArtikelKategorieViewModel.Name">
+            <summary>
+            An dexcription of this article category
+            </summary>
+        </member>
+        <member name="T:Service.Models.ArtikelViewModel">
+            <summary>
+            Represents an article that can be ordered
+            </summary>
+        </member>
+        <member name="P:Service.Models.ArtikelViewModel.ArtikelNummer">
+            <summary>
+            The Id of the article
+            </summary>
+        </member>
+        <member name="P:Service.Models.ArtikelViewModel.Bezeichnung">
+            <summary>
+            A description of the article
+            </summary>
+        </member>
+        <member name="P:Service.Models.ArtikelViewModel.Kategorien">
+            <summary>
+            A further specification of the article
+            </summary>
+        </member>
+    </members>
+</doc>
