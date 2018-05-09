@@ -10,5 +10,6 @@ namespace Article.Domain
 		IEnumerable<Artikel> LadeAlleArtikel();
 		IEnumerable<Artikel> LadeArtikelViaKatgeorie(string kategorieName);
 		// void SpeichereNeuenArtikel(Artikel artikel);
+		Artikel CreateNew(int artikelNummer);
 	}
 }

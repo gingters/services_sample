@@ -12,7 +12,7 @@ namespace Article.Services
 	public class ArtikelRepository : IArtikelRepository
 	{
 		private readonly ILogger<ArtikelRepository> _logger;
-		
+
 		private readonly IAggregateFactory _factory;
 		private readonly IEventStore _store;
 
@@ -43,6 +43,8 @@ namespace Article.Services
 			}
 
 			_logger?.LogInformation("Artikel {ArtikelNummer} wurde geladen: {ArtikelBezeichnung}", artikelNummer, article.Bezeichnung);
+
+			article.EventRaised += (s, e) => { _store.Store(e.Event); };
 			return article;
 		}
 
@@ -65,6 +67,12 @@ namespace Article.Services
 				artikel.ApplyEvent(evt);
 			}
 
+			// until here was replay, from now on the entity lives
+			foreach (var artikel in liste)
+			{
+				artikel.EventRaised += (s, e) => { _store.Store(e.Event); };
+			}
+
 			return liste;
 		}
 
@@ -76,6 +84,16 @@ namespace Article.Services
 
 			_logger?.LogInformation("Es wurden {ArtikelAnzahl} Artikel mit der Kategorie {KategorieName} gefunden.", artikel.Length, kategorieName);
 
+			return artikel;
+		}
+
+		public Artikel CreateNew(int artikelNummer)
+		{
+			// Move to factory
+			var artikel = _factory.CreateEntity<Artikel>(artikelNummer);
+
+			// This is the 'Store change to repo'
+			artikel.EventRaised += (s, e) => { _store.Store(e.Event); };
 			return artikel;
 		}
 

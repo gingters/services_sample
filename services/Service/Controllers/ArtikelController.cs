@@ -20,16 +20,12 @@ namespace Service.Controllers
 		private readonly IArtikelRepository _artikelRepo;
 		private readonly IMapper _mapper;
 		private readonly ArtikelCommandHandler _handler;
-		private readonly IEventStore _eventStore;
-		private readonly IAggregateFactory _factory;
 
-		public ArtikelController(IArtikelRepository artikelRepo, IMapper mapper, ArtikelCommandHandler handler, IEventStore eventStore, IAggregateFactory factory)
+		public ArtikelController(IArtikelRepository artikelRepo, IMapper mapper, ArtikelCommandHandler handler)
 		{
 			_artikelRepo = artikelRepo ?? throw new ArgumentNullException(nameof(artikelRepo));
 			_mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 			_handler = handler ?? throw new ArgumentNullException(nameof(handler));
-			_eventStore = eventStore;
-			_factory = factory;
 		}
 
 		[HttpGet]

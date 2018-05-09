@@ -11,34 +11,23 @@ namespace Article.Services
 	public class ArtikelCommandHandler
 	{
 		private readonly IArtikelRepository _repo;
-		private readonly IAggregateFactory _factory;
-		private readonly IEventStore _store;
 
-		public ArtikelCommandHandler(IArtikelRepository repo, IAggregateFactory factory, IEventStore store)
+		public ArtikelCommandHandler(IArtikelRepository repo)
 		{
 			_repo = repo;
-			_factory = factory;
-			_store = store;
 		}
 
 		public void Handle(ArtikelNeuanlageCommand command)
 		{
 			var artikel = _repo.LadeArtikelMitKategorien(command.Artikelnummer);
-			
+
 			// pre-checks
 			if (artikel != null)
 				throw new InvalidOperationException("Artikel existiert schon");
 
-			artikel = _factory.CreateEntity<Artikel>(command.Artikelnummer);
-			
-			// This is the 'Store change to repo'
-			artikel.EventRaised += (s, e) => { _store.Store(e.Event); };
-
+			artikel = _repo.CreateNew(command.Artikelnummer);
 			artikel.Neuanlage(command.Artikelbezeichnung, command.Kategorien);
-
-			// _repo.SpeichereNeuenArtikel(artikel);
 		}
-
 	}
 
 	public interface IEventStore
@@ -63,7 +52,7 @@ namespace Article.Services
 
 				AggregateId = 1701,
 				Artikelbezeichnung = "Plüscheinhorn",
-				Kategorien = new string[] { "klein", "mittel", "groß"}
+				Kategorien = new string[] { "klein", "mittel", "groß" }
 			});
 		}
 
