@@ -48,5 +48,11 @@ namespace Article.Services
 
 			return artikel;
 		}
+
+		public void SpeichereNeuenArtikel(Artikel artikel)
+		{
+			_context.Artikel.Add(artikel);
+			_context.SaveChanges();
+		}
 	}
 }

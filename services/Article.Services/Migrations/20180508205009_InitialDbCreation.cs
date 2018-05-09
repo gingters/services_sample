@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Article.Services.Migrations
 {
@@ -11,8 +10,7 @@ namespace Article.Services.Migrations
                 name: "Artikel",
                 columns: table => new
                 {
-                    ArtikelNummer = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ArtikelNummer = table.Column<int>(nullable: false),
                     Bezeichnung = table.Column<string>(nullable: false)
                 },
                 constraints: table =>

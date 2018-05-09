@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Article.Services.Migrations
 {
     [DbContext(typeof(ArtikelContext))]
-    [Migration("20180508095900_InitialDbCreation")]
+    [Migration("20180508205009_InitialDbCreation")]
     partial class InitialDbCreation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,9 +22,7 @@ namespace Article.Services.Migrations
 
             modelBuilder.Entity("Article.Domain.Artikel", b =>
                 {
-                    b.Property<int>("ArtikelNummer")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("ArtikelNummer");
 
                     b.Property<string>("Bezeichnung")
                         .IsRequired();

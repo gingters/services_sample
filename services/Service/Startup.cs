@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Article.Domain;
 using Article.Services;
 using AutoMapper;
+using Domain.Abstractions;
+using Domain.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,9 +41,11 @@ namespace Service
 				c.CreateMap<Artikel, ArtikelViewModel>();
 				c.CreateMap<ArtikelKategorie, ArtikelKategorieViewModel>();
 			});
-
+			services.AddScoped<ArtikelCommandHandler>();
 			services.AddSingleton<IMapper>(ctx => mapperCOnfig.CreateMapper());
-
+			services.AddScoped<IAggregateFactory, AggregateFactory>();
+			services.AddSingleton<IEventStore, EventStore>();
+			services.AddScoped<IEventDispatcher<Artikel>, TypeBasedEventDispatcher<Artikel>>();
 			services.AddDbContext<ArtikelContext>(options => options
 				.UseSqlServer(Configuration.GetConnectionString("sqlserver")));
 			services.AddScoped<IArtikelRepository, ArtikelRepository>();

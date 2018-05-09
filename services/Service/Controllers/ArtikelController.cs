@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Article.Domain;
+using Article.Services;
 using AutoMapper;
+using Domain.Abstractions;
+using Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Models;
@@ -16,11 +19,17 @@ namespace Service.Controllers
 	{
 		private readonly IArtikelRepository _artikelRepo;
 		private readonly IMapper _mapper;
+		private readonly ArtikelCommandHandler _handler;
+		private readonly IEventStore _eventStore;
+		private readonly IAggregateFactory _factory;
 
-		public ArtikelController(IArtikelRepository artikelRepo, IMapper mapper)
+		public ArtikelController(IArtikelRepository artikelRepo, IMapper mapper, ArtikelCommandHandler handler, IEventStore eventStore, IAggregateFactory factory)
 		{
 			_artikelRepo = artikelRepo ?? throw new ArgumentNullException(nameof(artikelRepo));
 			_mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+			_handler = handler ?? throw new ArgumentNullException(nameof(handler));
+			_eventStore = eventStore;
+			_factory = factory;
 		}
 
 		[HttpGet]
@@ -42,12 +51,51 @@ namespace Service.Controllers
 		[Produces("application/json", "application/xml")]
 		public IActionResult GetById(int artikelNummer)
 		{
-			var result = _mapper.Map<ArtikelViewModel>(_artikelRepo.LadeArtikelMitKategorien(artikelNummer));
+			// var result = _mapper.Map<ArtikelViewModel>(_artikelRepo.LadeArtikelMitKategorien(artikelNummer));
 
-			if (result == null)
+			// Todo: move this to repository
+			var events = _eventStore.Get(artikelNummer);
+			if (!events.Any())
 				return NotFound();
 
-			return Ok(result);
+			var result = _factory.CreateEntity<Artikel>(artikelNummer);
+			foreach (var evt in events)
+			{
+				result.ApplyEvent(evt);
+			}
+			// ^^ this all to repo
+
+			return Ok(_mapper.Map<ArtikelViewModel>(result));
+		}
+
+		[HttpPost]
+		public IActionResult AddNew([FromBody] ArtikelViewModel newArticle)
+		{
+			var command = new ArtikelNeuanlageCommand()
+			{
+				Artikelnummer = newArticle.ArtikelNummer,
+				Artikelbezeichnung = newArticle.Bezeichnung,
+			};
+
+			if (newArticle.Kategorien != null)
+			{
+				command.Kategorien = newArticle.Kategorien.Select(k => k.Name).ToArray();
+			}
+
+			try
+			{
+				_handler.Handle(command);
+			}
+			catch (ArtikelException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+			catch (Exception)
+			{
+				return new StatusCodeResult(500);
+			}
+
+			return Ok();
 		}
 	}
 }

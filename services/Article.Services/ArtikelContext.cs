@@ -21,9 +21,17 @@ namespace Article.Services
 		{
 			modelBuilder.Entity<Artikel>()
 				.HasKey(a => a.ArtikelNummer);
+		
+			modelBuilder.Entity<Artikel>()
+				.Property(a => a.ArtikelNummer)
+				.ValueGeneratedNever();
+
 			modelBuilder.Entity<Artikel>()
 				.Property(a => a.Bezeichnung)
 				.IsRequired();
+			
+			modelBuilder.Entity<Artikel>()
+				.Ignore(a => a.Version);
 
 			modelBuilder.Entity<ArtikelKategorie>()
 				.HasKey(k => new { k.ArtikelNummer, k.Name });
