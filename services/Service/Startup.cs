@@ -46,8 +46,8 @@ namespace Service
 			services.AddScoped<IAggregateFactory, AggregateFactory>();
 			services.AddSingleton<IEventStore, EventStore>();
 			services.AddScoped<IEventDispatcher<Artikel>, TypeBasedEventDispatcher<Artikel>>();
-			services.AddDbContext<ArtikelContext>(options => options
-				.UseSqlServer(Configuration.GetConnectionString("sqlserver")));
+			//services.AddDbContext<ArtikelContext>(options => options
+			//	.UseSqlServer(Configuration.GetConnectionString("sqlserver")));
 			services.AddScoped<IArtikelRepository, ArtikelRepository>();
 
 			services.AddMvc(options => options.RespectBrowserAcceptHeader = true)
@@ -94,12 +94,12 @@ namespace Service
 		{
 			if (env.IsDevelopment())
 			{
-				using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-				{ 
-					// Probably not good for PROD, should use a separate tool for that ;)
-					scope.ServiceProvider.GetRequiredService<ArtikelContext>()
-						.Database.Migrate();
-				}
+				//using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+				//{ 
+				//	// Probably not good for PROD, should use a separate tool for that ;)
+				//	scope.ServiceProvider.GetRequiredService<ArtikelContext>()
+				//		.Database.Migrate();
+				//}
 
 				app.UseDeveloperExceptionPage();
 			}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,11 +30,13 @@ namespace Article.Services
 				throw new InvalidOperationException("Artikel existiert schon");
 
 			artikel = _factory.CreateEntity<Artikel>(command.Artikelnummer);
+			
+			// This is the 'Store change to repo'
 			artikel.EventRaised += (s, e) => { _store.Store(e.Event); };
 
 			artikel.Neuanlage(command.Artikelbezeichnung, command.Kategorien);
 
-			_repo.SpeichereNeuenArtikel(artikel);
+			// _repo.SpeichereNeuenArtikel(artikel);
 		}
 
 	}
@@ -42,6 +45,7 @@ namespace Article.Services
 	{
 		void Store(IEvent evt);
 		IList<IEvent> Get(int aggregateId, int from = 0);
+		IEnumerable<IEvent> GetAllEvents();
 	}
 
 	public class EventStore : IEventStore
@@ -75,6 +79,12 @@ namespace Article.Services
 				.Where(e => e.AggregateId == aggregateId && e.Id >= from)
 				.OrderBy(e => e.Id)
 				.ToList();
+		}
+
+		public IEnumerable<IEvent> GetAllEvents()
+		{
+			foreach (var evt in _events)
+				yield return evt;
 		}
 	}
 }

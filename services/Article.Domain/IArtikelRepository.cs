@@ -9,6 +9,6 @@ namespace Article.Domain
 		Artikel LadeArtikelMitKategorien(int artikelNummer);
 		IEnumerable<Artikel> LadeAlleArtikel();
 		IEnumerable<Artikel> LadeArtikelViaKatgeorie(string kategorieName);
-		void SpeichereNeuenArtikel(Artikel artikel);
+		// void SpeichereNeuenArtikel(Artikel artikel);
 	}
 }

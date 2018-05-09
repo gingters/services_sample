@@ -51,19 +51,10 @@ namespace Service.Controllers
 		[Produces("application/json", "application/xml")]
 		public IActionResult GetById(int artikelNummer)
 		{
-			// var result = _mapper.Map<ArtikelViewModel>(_artikelRepo.LadeArtikelMitKategorien(artikelNummer));
+			var result = _mapper.Map<ArtikelViewModel>(_artikelRepo.LadeArtikelMitKategorien(artikelNummer));
 
-			// Todo: move this to repository
-			var events = _eventStore.Get(artikelNummer);
-			if (!events.Any())
+			if (result == null)
 				return NotFound();
-
-			var result = _factory.CreateEntity<Artikel>(artikelNummer);
-			foreach (var evt in events)
-			{
-				result.ApplyEvent(evt);
-			}
-			// ^^ this all to repo
 
 			return Ok(_mapper.Map<ArtikelViewModel>(result));
 		}
