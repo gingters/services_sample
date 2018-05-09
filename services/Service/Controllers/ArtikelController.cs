@@ -55,6 +55,22 @@ namespace Service.Controllers
 			return Ok(_mapper.Map<ArtikelViewModel>(result));
 		}
 
+		[HttpDelete("{artikelNummer}")]
+
+		public IActionResult Delete(int artikelNummer)
+		{
+			var result = _artikelRepo.LadeArtikelMitKategorien(artikelNummer);
+
+			if (result == null)
+				return NotFound();
+
+			var cmd = new ArtikelLoeschCommand() { Artikelnummer = artikelNummer };
+			_handler.Handle(cmd);
+
+			return Ok();
+		}
+
+
 		[HttpPost]
 		public IActionResult AddNew([FromBody] ArtikelViewModel newArticle)
 		{
@@ -81,6 +97,34 @@ namespace Service.Controllers
 			{
 				return new StatusCodeResult(500);
 			}
+
+			return Ok();
+		}
+
+		[HttpPost("{artikelNummer}/{kategorieName}")]
+		public IActionResult AddKategorie(int artikelNummer, string kategorieName)
+		{
+			var result = _artikelRepo.LadeArtikelMitKategorien(artikelNummer);
+
+			if (result == null)
+				return NotFound();
+
+			var cmd = new ArtikelKategorieHinzufuegenCommand() { Artikelnummer = artikelNummer, Kategoriename = kategorieName };
+			_handler.Handle(cmd);
+
+			return Ok();
+		}
+
+		[HttpDelete("{artikelNummer}/{kategorieName}")]
+		public IActionResult DeleteKategorie(int artikelNummer, string kategorieName)
+		{
+			var result = _artikelRepo.LadeArtikelMitKategorien(artikelNummer);
+
+			if (result == null)
+				return NotFound();
+
+			var cmd = new ArtikelKategorieEntfernenCommand() { Artikelnummer = artikelNummer, Kategoriename = kategorieName };
+			_handler.Handle(cmd);
 
 			return Ok();
 		}

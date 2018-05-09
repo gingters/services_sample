@@ -16,6 +16,8 @@ namespace Article.Domain
 		public int Version { get; private set; }
 		public HashSet<ArtikelKategorie> Kategorien { get; private set; } = new HashSet<ArtikelKategorie>();
 
+		public bool IsDeleted => ArtikelNummer < 0;
+
 		public Artikel()
 		{
 		}

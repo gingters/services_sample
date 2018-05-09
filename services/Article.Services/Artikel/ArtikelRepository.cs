@@ -45,7 +45,8 @@ namespace Article.Services
 			_logger?.LogInformation("Artikel {ArtikelNummer} wurde geladen: {ArtikelBezeichnung}", artikelNummer, article.Bezeichnung);
 
 			article.EventRaised += (s, e) => { _store.Store(e.Event); };
-			return article;
+			
+			return article.ArtikelNummer > 0 ? article : null;
 		}
 
 		public IEnumerable<Artikel> LadeAlleArtikel()
@@ -73,7 +74,7 @@ namespace Article.Services
 				artikel.EventRaised += (s, e) => { _store.Store(e.Event); };
 			}
 
-			return liste;
+			return liste.Where(a => a.ArtikelNummer > 0);
 		}
 
 		public IEnumerable<Artikel> LadeArtikelViaKatgeorie(string kategorieName)

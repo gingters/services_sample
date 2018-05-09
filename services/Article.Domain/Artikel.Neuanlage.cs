@@ -20,6 +20,9 @@ namespace Article.Domain
 			if (String.IsNullOrWhiteSpace(bezeichnung))
 				throw new ArtikelException("Bezeichnung darf nicht leer sein.");
 
+			if (IsDeleted)
+				throw new ArtikelException("Gelöschter Artikel kann nicht neu angelegt werden");
+
 			var evt = new ArtikelAngelegtEvent()
 			{
 				TimeStamp = DateTime.UtcNow,

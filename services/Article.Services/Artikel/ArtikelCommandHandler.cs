@@ -28,6 +28,29 @@ namespace Article.Services
 			artikel = _repo.CreateNew(command.Artikelnummer);
 			artikel.Neuanlage(command.Artikelbezeichnung, command.Kategorien);
 		}
+
+		public void Handle(ArtikelLoeschCommand command)
+		{
+			var artikel = _repo.LadeArtikelMitKategorien(command.Artikelnummer);
+			
+			// Todo:
+			// Check all living references to this article (i.e. in not yet sold baskets)
+			// and update them accordingly
+
+			artikel.Loesche();
+		}
+
+		public void Handle(ArtikelKategorieHinzufuegenCommand command)
+		{
+			var artikel = _repo.LadeArtikelMitKategorien(command.Artikelnummer);
+			artikel.FuegeKategorieHinzu(command.Kategoriename);
+		}
+		
+		public void Handle(ArtikelKategorieEntfernenCommand command)
+		{
+			var artikel = _repo.LadeArtikelMitKategorien(command.Artikelnummer);
+			artikel.EntferneKategorie(command.Kategoriename);
+		}
 	}
 
 	public interface IEventStore
